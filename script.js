@@ -1,43 +1,42 @@
-//your JS code here. If required.
-const output = document.getElementById("output");
-const btn = document.getElementById("download-images-button");
-
-const images = [
-  { url: "https://picsum.photos/id/237/200/300" },
-  { url: "https://picsum.photos/id/238/200/300" },
-  { url: "https://picsum.photos/id/239/200/300" },
+// Sample array of image URLs
+const imageUrls = [
+    { url: 'url1.jpg' },
+    { url: 'url2.jpg' },
+    { url: 'url3.jpg' },
+    // Add more image URLs as needed
 ];
 
-let file1 = new Promise((resolve)=>{
-	setTimeout(()=>{
-		resolve(images[0].url);
-	}.2000)
-})
-let file2 = new Promise((resolve)=>{
-	setTimeout(()=>{
-		resolve(images[1].url);
-	}.1000)
-})
-let file3 = new Promise((resolve)=>{
-	setTimeout(()=>{
-		resolve(images[2].url);
-	}.3000)
-})
-let i = 1;
-let x = Promise.all([file1,file2,file3]);
-x.then(images=>{
-	images.forEach((image)=>{
-		const a = document.createElement("a");
-        a.href = image;
-		a.setAttribut('download', `${i}`);
-		i++;
-		output.appenchChild(a);
-	})
-	
-})
+// Function to download an image given its URL
+const downloadImage = (image) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(`Failed to load image's URL: ${image.url}`);
+        img.src = image.url;
+    });
+};
 
+// Function to download all images in parallel using Promise.all
+const downloadAllImages = (imageUrls) => {
+    const promises = imageUrls.map(downloadImage);
+    return Promise.all(promises);
+};
 
+// Function to display the downloaded images in the output div
+const displayImages = (images) => {
+    const outputDiv = document.getElementById('output');
+    images.forEach((img) => {
+        outputDiv.appendChild(img);
+    });
+};
 
-
-
-
+// Event listener for the download button
+document.getElementById('download-images-button').addEventListener('click', () => {
+    downloadAllImages(imageUrls)
+        .then((images) => {
+            displayImages(images);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+});
